@@ -1,0 +1,2 @@
+"use strict";
+const backendAddress = 'https://redesigned-meme-r479rgjqgr54fp4wp.github.dev/';
