@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     "blog",
     'corsheaders',
+    'drf_yasg', # swagger
+    'coreapi', # swagger
 ]
 
 MIDDLEWARE = [
@@ -142,3 +144,4 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+SERVER_URL = "https://redesigned-meme-r479rgjqgr54fp4wp-8000.app.github.dev"

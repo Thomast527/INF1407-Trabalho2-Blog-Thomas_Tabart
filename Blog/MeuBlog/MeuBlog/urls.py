@@ -18,8 +18,37 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import path, include
+from MeuBlog.settings import SERVER_URL
+
+from rest_framework import routers
+from rest_framework import permissions
+from rest_framework.documentation import include_docs_urls
+from rest_framework.schemas import get_schema_view
+from drf_yasg.views import get_schema_view as yasg_schema_view
+from drf_yasg import openapi
+
+
+schema_view = yasg_schema_view(
+    openapi.Info(
+        title = "API Blog",
+        default_version = 'v1',
+        description = "API for the Blog",
+        contact = openapi.Contact(email="thomas@aqui.com"),
+        license = openapi.License(name='GNU GPLv3'),
+    ),
+    public = True,
+    permission_classes = (permissions.AllowAny,),
+    url = SERVER_URL,
+)
 
 urlpatterns = [
+    path('docs/', include_docs_urls(title = 'Documentação da API')),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path("admin/", admin.site.urls),
     path("blog/", include ('blog.urls')),
+    path('openapi', get_schema_view(
+        title="API para Artigos", description="API para obter dados dos artigos",
+        ), 
+        name = 'openapi-schema'
+    ),
 ]
