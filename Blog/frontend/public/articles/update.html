@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualização</title>
+
+    <script src="../javascript/constantes.js" defer></script>
+    <script src="../javascript/artigos/update.js" defer></script>
+</head>
+
+<body>
+
+    <iframe src="../cabecalho.html" frameborder="0" width="100%" height="50" id="cabecalho"></iframe>
+
+    <h1>Atualizando o Carro #<span id="artigoId"></span></h1>
+
+    <form id="meuFormulario">
+
+        <!-- id escondido -->
+        <input type="hidden" name="id" id="id">
+
+        <div>
+            <label for="titulo">Título</label><br>
+            <input id="titulo" type="text" name="titulo" required>
+        </div>
+
+        <div>
+            <label for="conteudo">Conteúdo</label><br>
+            <textarea id="conteudo" name="conteudo" rows="10" cols="60" required></textarea>
+        </div>
+
+        <div>
+            <label for="categoria">Categoria (ID)</label><br>
+            <input id="categoria" type="number" name="categoria" min="1">
+        </div>
+
+        <div>
+            <label for="autor">Autor (ID) — temporaire</label><br>
+            <input id="autor" type="number" name="autor" min="1">
+            <p style="font-size:0.9em;color:#666;"></p>
+        </div>
+
+        <div>
+            <button id="atualiza" name="atualiza" type="submit">Atualiza</button>
+        </div>
+    </form>
+
+    <div id="mensagem" style="margin-top:1rem;"></div>
+
+</body>
+</html>

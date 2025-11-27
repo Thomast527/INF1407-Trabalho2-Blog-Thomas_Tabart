@@ -6,25 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raiz de Artigos</title>
     <script src="../javascript/artigos/listaArtigos.js"></script>
-    <script src="javascript/constantes.js"></script>
+    <script src="../javascript/constantes.js"></script>
 </head>
 <body>
     <iframe src="../cabecalho.html" frameborder="0" width="100%" height="50" id="cabecalho"></iframe>
 
     <h2>Lista de artigos</h2>   
-
-    <button id="novo">Novo Artigo</button>
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Autor</th>
-                <th>Data</th>
-            </tr>
-        </thead>
-        <tbody id="idtbody"></tbody>
-    </table>
-
+    <form action="" method="get">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Data</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody id="idtbody"></tbody>
+        </table>
+        <input type="button" value="Insere" id="insere"/>
+        <input type="button" value="Remove" id="remove"/>
+    </form>
 </body>
 </html>

@@ -84,14 +84,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'DBBlog': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'blog.sqlite3',
-    },
+    }
 }
 
-DATABASE_ROUTERS = ['MeuBlog.db_router.DBRouter']
+
+#DATABASE_ROUTERS = ['MeuBlog.db_router.DBRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
