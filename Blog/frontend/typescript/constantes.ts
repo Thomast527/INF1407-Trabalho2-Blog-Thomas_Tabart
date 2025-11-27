@@ -1,1 +1,1 @@
-const backendAddress = 'https://redesigned-meme-r479rgjqgr54fp4wp.github.dev/';
+const backendAddress = 'https://redesigned-meme-r479rgjqgr54fp4wp-8000.app.github.dev/';

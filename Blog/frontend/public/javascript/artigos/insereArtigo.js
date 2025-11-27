@@ -3,37 +3,44 @@ window.onload = () => {
     const botao = document.getElementById('insere');
     const form = document.getElementById('meuFormulario');
     const mensagemDiv = document.getElementById('mensagem');
-    if (!botao || !form || !mensagemDiv) {
-        console.error('Elementos do formulário não foram encontrados.');
+    if (!form || !mensagemDiv) {
+        console.error('Form or message div not found');
         return;
     }
-    botao.addEventListener('click', (evento) => {
+    form.addEventListener('submit', (evento) => {
         evento.preventDefault();
         const elements = form.elements;
         const data = {};
         for (let i = 0; i < elements.length; i++) {
-            const element = elements[i];
-            if (element.name) {
-                data[element.name] = element.value;
+            const el = elements[i];
+            if (!el.name)
+                continue;
+            const val = el.value;
+            if (el.type === 'number' && val !== '') {
+                data[el.name] = Number(val);
+            }
+            else {
+                data[el.name] = val;
             }
         }
-        fetch(backendAddress + 'blog/artigos/', {
+        fetch(backendAddress + 'blog/umartigo/', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' }
         })
-            .then((response) => {
+            .then(async (response) => {
             if (response.ok) {
-                mensagemDiv.innerHTML = 'Artigo inserido com sucesso!';
+                mensagemDiv.innerText = 'Artigo inserido com sucesso!';
                 form.reset();
             }
             else {
-                mensagemDiv.innerHTML = 'Erro ao inserir artigo.';
+                const texto = await response.text();
+                mensagemDiv.innerText = 'Erro ao inserir: ' + response.status + ' ' + texto;
             }
         })
-            .catch((error) => {
-            console.error(error);
-            mensagemDiv.innerHTML = 'Erro de comunicação com o servidor.';
+            .catch((err) => {
+            console.error(err);
+            mensagemDiv.innerText = 'Erro de comunicação com o servidor.';
         });
     });
 };
