@@ -8,6 +8,11 @@ from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
+from rest_framework.decorators import authentication_classes
+
 class ArtigosView(APIView):
     @swagger_auto_schema(
         operation_summary='Lista todos os artigos',
@@ -50,6 +55,10 @@ class ArtigosView(APIView):
     
 
 class ArtigoView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
     @swagger_auto_schema(
 		operation_summary='Criar carro', operation_description="Criar um novo carro",
 		request_body=openapi.Schema(
@@ -58,18 +67,21 @@ class ArtigoView(APIView):
 				'titulo': openapi.Schema(default='My trip to London', description='Titulo do artigo', type=openapi.TYPE_STRING,),
 				'conteudo': openapi.Schema(default="My first trip into a foreign country was in England when I was 12...", description='Contento do artigo', type=openapi.TYPE_STRING,),
 				'categoria': openapi.Schema(default=1, description='Id of the category of the article', type=openapi.TYPE_INTEGER),
-				'autor': openapi.Schema(default=1, description='Id of the autor of the article', type=openapi.TYPE_INTEGER),
 			},
 		),
 		responses={201: ArtigoSerializer(), 400: 'Dados errados',},
 	)
     def post(self, request):
-        serializer = ArtigoSerializer(data=request.data)
+        data = request.data.copy()
+        data['autor'] = request.user.id  # impose l’auteur authentifié
+
+        serializer = ArtigoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 
     @swagger_auto_schema(

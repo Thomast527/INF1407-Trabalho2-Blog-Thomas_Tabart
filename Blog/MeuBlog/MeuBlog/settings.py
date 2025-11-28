@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'coreapi', # swagger
     'accounts', # nosso app de AAA
     'rest_framework.authtoken', # Token de autenticação
+    'django_rest_passwordreset', # para recuperar senha
+
 ]
 
 MIDDLEWARE = [
