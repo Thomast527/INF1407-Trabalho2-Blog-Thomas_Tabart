@@ -1,7 +1,28 @@
 "use strict";
-window.onload = () => {
-    document.getElementById('insere')
-        .addEventListener('click', () => {
+async function obtemUsuario() {
+    const token = localStorage.getItem("token");
+    if (!token)
+        return null;
+    const resp = await fetch(backendAddress + "accounts/me/", {
+        method: "GET",
+        headers: {
+            "Authorization": "Token " + token
+        }
+    });
+    if (resp.ok) {
+        return await resp.json();
+    }
+    return null;
+}
+window.onload = async () => {
+    var _a, _b;
+    const user = await obtemUsuario();
+    const botaoInsere = document.getElementById('insere');
+    const isEscritor = (_b = (_a = user === null || user === void 0 ? void 0 : user.groups) === null || _a === void 0 ? void 0 : _a.includes("escritor")) !== null && _b !== void 0 ? _b : false;
+    if (!isEscritor) {
+        botaoInsere.style.display = "none";
+    }
+    botaoInsere.addEventListener('click', () => {
         location.href = 'insereArtigo.html';
     });
     document.getElementById("remove")

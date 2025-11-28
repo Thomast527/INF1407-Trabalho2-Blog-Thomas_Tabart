@@ -83,15 +83,10 @@ class ArtigosView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
-    
-
-
 class ArtigoView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def get_permissions(self):
-        # Toute méthode nécessite authentification
         return [IsAuthenticated()]
 
 
@@ -107,15 +102,23 @@ class ArtigoView(APIView):
 		),
 		responses={201: ArtigoSerializer(), 400: 'Dados errados',},
 	)
+    # empêcher criação por usuarios sem role escritor
     def post(self, request):
+        if not request.user.groups.filter(name="escritor").exists():
+            return Response(
+                {"erro": "Você não tem permissão para publicar artigos."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         data = request.data.copy()
-        data['autor'] = request.user.id  # impose l’auteur authentifié
+        data['autor'] = request.user.id  
+
         serializer = ArtigoSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
 

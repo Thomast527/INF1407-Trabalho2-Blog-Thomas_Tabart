@@ -3,7 +3,6 @@ const id = params.get("id");
 
 const token = localStorage.getItem("token");
 
-// Configuration du fetch
 const fetchConfig: RequestInit = {
     method: "GET",
     headers: {}
@@ -22,21 +21,17 @@ fetch(backendAddress + "blog/umartigo/" + id + "/", fetchConfig)
             return null;
         }
 
-        // Autre erreur que 200
         if (!resp.ok) {
             const txt = await resp.text();
             alert("Erro ao carregar artigo: " + resp.status + "\n" + txt);
             return null;
         }
 
-        // Si OK → on parse le JSON
         return resp.json();
     })
     .then(result => {
-        // Si on a déjà redirigé ou erreur → on stop
         if (!result) return;
 
-        // Données invalides ?
         if (!result.dados) {
             alert("Erro: dados do artigo não encontrados.");
             return;
@@ -49,7 +44,6 @@ fetch(backendAddress + "blog/umartigo/" + id + "/", fetchConfig)
         (document.getElementById("autor") as HTMLSpanElement).innerText = artigo.autor;
         (document.getElementById("data") as HTMLSpanElement).innerText = artigo.data_publicacao;
 
-        // Si c'est l'auteur → afficher bouton update
         if (result.est_autor === true) {
             const btn = document.getElementById("botaoUpdate") as HTMLButtonElement;
             btn.style.display = "block";

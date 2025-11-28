@@ -15,6 +15,8 @@ from rest_framework.views import APIView
 from .serializer import RegisterSerializer
 from django.contrib.auth.models import User
 
+from rest_framework.permissions import IsAuthenticated
+
 class CustomAuthToken(ObtainAuthToken):
     @swagger_auto_schema(
         operation_summary="Obter username pelo Token",
@@ -164,3 +166,16 @@ class RegisterView(APIView):
             }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        grupos = list(user.groups.values_list("name", flat=True))
+        return Response({
+            "username": user.username,
+            "id": user.id,
+            "groups": grupos
+        })

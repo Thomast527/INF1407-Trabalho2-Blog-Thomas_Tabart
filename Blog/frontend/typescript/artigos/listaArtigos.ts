@@ -1,14 +1,44 @@
-window.onload = () => {
-    (document.getElementById('insere') as HTMLButtonElement)
-        .addEventListener('click', () => { 
-            location.href = 'insereArtigo.html';
-        });
+async function obtemUsuario() {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+
+    const resp = await fetch(backendAddress + "accounts/me/", {
+        method: "GET",
+        headers: {
+            "Authorization": "Token " + token
+        }
+    });
+
+    if (resp.ok) {
+        return await resp.json();
+    }
+
+    return null;
+}
+
+window.onload = async () => {
+
+    const user = await obtemUsuario();
+    const botaoInsere = document.getElementById('insere') as HTMLButtonElement;
+
+    const isEscritor = user?.groups?.includes("escritor") ?? false;
+
+    if (!isEscritor) {
+        botaoInsere.style.display = "none";
+    }
+
+    botaoInsere.addEventListener('click', () => { 
+        location.href = 'insereArtigo.html';
+    });
 
     document.getElementById("remove")!
         .addEventListener("click", apagaArtigos);
 
     exibeListaDeArtigos();
 };
+
+
+
 
 function exibeListaDeArtigos() {
     fetch(backendAddress + "blog/lista/")
