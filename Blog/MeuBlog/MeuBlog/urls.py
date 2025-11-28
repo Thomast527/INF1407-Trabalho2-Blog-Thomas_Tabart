@@ -51,6 +51,5 @@ urlpatterns = [
         title="API para Artigos", description="API para obter dados dos artigos",
         ), 
         name = 'openapi-schema'
-    ),
-    
+    ),    
 ]

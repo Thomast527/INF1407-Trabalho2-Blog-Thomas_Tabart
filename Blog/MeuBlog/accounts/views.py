@@ -10,6 +10,11 @@ from django.contrib.auth import logout
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from rest_framework.views import APIView
+
+from .serializer import RegisterSerializer
+from django.contrib.auth.models import User
+
 class CustomAuthToken(ObtainAuthToken):
     @swagger_auto_schema(
         operation_summary="Obter username pelo Token",
@@ -142,3 +147,20 @@ class CustomAuthToken(ObtainAuthToken):
             return Response({'token': token.key, "message": "Senha alterada com sucesso."},status=status.HTTP_200_OK)
         else:
             return Response({"old_password": ["Senha atual incorreta."]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterView(APIView):
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+
+            return Response({
+                "msg": "Usuário criado com sucesso!",
+                "token": token.key
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
