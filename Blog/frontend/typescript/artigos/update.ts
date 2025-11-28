@@ -17,46 +17,58 @@ window.onload = () => {
 
     (document.getElementById("artigoId") as HTMLSpanElement).innerText = id;
 
-    fetch(backendAddress + "blog/umartigo/" + id + "/", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Token " + token
-        }
-    })
-        .then(async response => {
-            if (!response.ok) {
-                const msg = await response.text();
-                throw new Error("Erro ao carregar artigo: " + msg);
+    const categoriaSelect = document.getElementById("categoria") as HTMLSelectElement;
+
+    let artigoData: any = null;
+
+    Promise.all([
+        fetch(backendAddress + "blog/umartigo/" + id + "/", {
+            headers: { "Authorization": "Token " + token }
+        }).then(r => r.json()),
+
+        fetch(backendAddress + "blog/categorias/")
+            .then(r => r.json())
+    ])
+    .then(([artigo, categorias]) => {
+
+        artigoData = artigo;
+
+        // Remplit le formulaire
+        (document.getElementById("id") as HTMLInputElement).value = artigo.id;
+        (document.getElementById("titulo") as HTMLInputElement).value = artigo.titulo;
+        (document.getElementById("conteudo") as HTMLInputElement).value = artigo.conteudo;
+
+        // 🔵 Remplir le select des catégories
+        categorias.forEach((cat: any) => {
+            const opt = document.createElement("option");
+            opt.value = cat.id;
+            opt.textContent = cat.nome;
+
+            // Pré-sélectionner la catégorie actuelle
+            if (cat.id === artigo.categoria) {
+                opt.selected = true;
             }
-            return response.json();
-        })
-        .then(artigo => {
-            (document.getElementById("id") as HTMLInputElement).value = artigo.id;
-            (document.getElementById("titulo") as HTMLInputElement).value = artigo.titulo;
-            (document.getElementById("conteudo") as HTMLInputElement).value = artigo.conteudo;
-            (document.getElementById("categoria") as HTMLInputElement).value = artigo.categoria;
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Erro ao carregar o artigo.");
+
+            categoriaSelect.appendChild(opt);
         });
+
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Erro ao carregar dados.");
+    });
 
     const botao = document.getElementById("atualiza") as HTMLButtonElement;
 
     botao.addEventListener("click", (evento) => {
         evento.preventDefault();
 
-        const form = document.getElementById("meuFormulario") as HTMLFormElement;
-        const elements = form.elements;
-        const data: Record<string, any> = {};
-
-        for (let i = 0; i < elements.length; i++) {
-            const element = elements[i] as HTMLInputElement | HTMLTextAreaElement;
-            if (element.name) {
-                data[element.name] = element.value;
-            }
-        }
+        const data = {
+            id: artigoData.id,
+            titulo: (document.getElementById("titulo") as HTMLInputElement).value,
+            conteudo: (document.getElementById("conteudo") as HTMLTextAreaElement).value,
+            categoria: categoriaSelect.value
+        };
 
         fetch(backendAddress + "blog/umartigo/" + id + "/", {
             method: "PUT",
@@ -66,19 +78,20 @@ window.onload = () => {
             },
             body: JSON.stringify(data)
         })
-            .then(async (response) => {
-                const msgDiv = document.getElementById("mensagem") as HTMLDivElement;
-                if (response.ok) {
-                    msgDiv.innerHTML = "✔️ Artigo atualizado com sucesso!";
-                } else {
-                    const msg = await response.text();
-                    msgDiv.innerHTML = "Erro: " + response.status + "<br>" + msg;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                const msgDiv = document.getElementById("mensagem") as HTMLDivElement;
-                msgDiv.innerHTML = "Erro ao comunicar com o servidor.";
-            });
+        .then(async (response) => {
+            const msgDiv = document.getElementById("mensagem") as HTMLDivElement;
+
+            if (response.ok) {
+                msgDiv.innerHTML = "✔️ Artigo atualizado com sucesso!";
+            } else {
+                const msg = await response.text();
+                msgDiv.innerHTML = "Erro: " + response.status + "<br>" + msg;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            const msgDiv = document.getElementById("mensagem") as HTMLDivElement;
+            msgDiv.innerHTML = "Erro ao comunicar com o servidor.";
+        });
     });
 };

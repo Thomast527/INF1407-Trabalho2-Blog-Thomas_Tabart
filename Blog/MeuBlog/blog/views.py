@@ -164,3 +164,13 @@ class ArtigoView(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+from .models import Categoria
+from .serializers import CategoriaSerializer
+
+class CategoriaList(APIView):
+    def get(self, request):
+        categorias = Categoria.objects.all()
+        serializer = CategoriaSerializer(categorias, many=True)
+        return Response(serializer.data)

@@ -1,42 +1,53 @@
 "use strict";
 window.onload = () => {
-    const form = document.getElementById('meuFormulario');
-    const mensagemDiv = document.getElementById('mensagem');
-    form.addEventListener('submit', (evento) => {
+    const categoriaSelect = document.getElementById("categoria");
+    fetch(backendAddress + "blog/categorias/")
+        .then(res => res.json())
+        .then(categorias => {
+        categorias.forEach((cat) => {
+            const opt = document.createElement("option");
+            opt.value = cat.id;
+            opt.textContent = cat.nome;
+            categoriaSelect.appendChild(opt);
+        });
+    })
+        .catch(err => console.error("Erro ao carregar categorias:", err));
+    const form = document.getElementById("meuFormulario");
+    const mensagemDiv = document.getElementById("mensagem");
+    form.addEventListener("submit", (evento) => {
         evento.preventDefault();
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) {
-            mensagemDiv.innerText = "Você precisa estar logado para publicar um artigo.";
+            mensagemDiv.innerText = "Você precisa estar logado!";
             return;
         }
-        const data = {};
-        const elements = form.elements;
-        for (let i = 0; i < elements.length; i++) {
-            const el = elements[i];
-            if (!el.name)
-                continue;
-            data[el.name] = el.type === 'number' ? Number(el.value) : el.value;
-        }
-        fetch(backendAddress + 'blog/umartigo/', {
-            method: 'POST',
+        const data = {
+            titulo: document.getElementById("titulo").value,
+            conteudo: document.getElementById("conteudo").value,
+            categoria: categoriaSelect.value
+        };
+        fetch(backendAddress + "blog/umartigo/", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': tokenKeyword + localStorage.getItem('token'),
+                "Content-Type": "application/json",
+                "Authorization": "Token " + token,
             },
             body: JSON.stringify(data),
         })
             .then(async (response) => {
             if (response.ok) {
-                mensagemDiv.innerText = '✔️ Artigo inserido com sucesso!';
+                mensagemDiv.innerText = "Artigo inserido com sucesso!";
                 form.reset();
             }
             else {
-                const texto = await response.text();
-                mensagemDiv.innerText = 'Erro ao inserir: ' + response.status + ' ' + texto;
+                const erroTxt = await response.text();
+                mensagemDiv.innerText =
+                    "Erro ao inserir artigo: " + response.status + "\n" + erroTxt;
             }
         })
-            .catch(() => {
-            mensagemDiv.innerText = 'Erro de comunicação com o servidor.';
+            .catch(err => {
+            console.error(err);
+            mensagemDiv.innerText = "Erro de comunicação com servidor.";
         });
     });
 };

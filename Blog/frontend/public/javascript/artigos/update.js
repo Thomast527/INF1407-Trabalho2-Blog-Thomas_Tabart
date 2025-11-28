@@ -13,42 +13,46 @@ window.onload = () => {
         return;
     }
     document.getElementById("artigoId").innerText = id;
-    fetch(backendAddress + "blog/umartigo/" + id + "/", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Token " + token
-        }
-    })
-        .then(async (response) => {
-        if (!response.ok) {
-            const msg = await response.text();
-            throw new Error("Erro ao carregar artigo: " + msg);
-        }
-        return response.json();
-    })
-        .then(artigo => {
+    const categoriaSelect = document.getElementById("categoria");
+    let artigoData = null;
+    Promise.all([
+        fetch(backendAddress + "blog/umartigo/" + id + "/", {
+            headers: { "Authorization": "Token " + token }
+        }).then(r => r.json()),
+        fetch(backendAddress + "blog/categorias/")
+            .then(r => r.json())
+    ])
+        .then(([artigo, categorias]) => {
+        artigoData = artigo;
+        // Remplit le formulaire
         document.getElementById("id").value = artigo.id;
         document.getElementById("titulo").value = artigo.titulo;
         document.getElementById("conteudo").value = artigo.conteudo;
-        document.getElementById("categoria").value = artigo.categoria;
+        // 🔵 Remplir le select des catégories
+        categorias.forEach((cat) => {
+            const opt = document.createElement("option");
+            opt.value = cat.id;
+            opt.textContent = cat.nome;
+            // Pré-sélectionner la catégorie actuelle
+            if (cat.id === artigo.categoria) {
+                opt.selected = true;
+            }
+            categoriaSelect.appendChild(opt);
+        });
     })
         .catch(err => {
         console.error(err);
-        alert("Erro ao carregar o artigo.");
+        alert("Erro ao carregar dados.");
     });
     const botao = document.getElementById("atualiza");
     botao.addEventListener("click", (evento) => {
         evento.preventDefault();
-        const form = document.getElementById("meuFormulario");
-        const elements = form.elements;
-        const data = {};
-        for (let i = 0; i < elements.length; i++) {
-            const element = elements[i];
-            if (element.name) {
-                data[element.name] = element.value;
-            }
-        }
+        const data = {
+            id: artigoData.id,
+            titulo: document.getElementById("titulo").value,
+            conteudo: document.getElementById("conteudo").value,
+            categoria: categoriaSelect.value
+        };
         fetch(backendAddress + "blog/umartigo/" + id + "/", {
             method: "PUT",
             headers: {

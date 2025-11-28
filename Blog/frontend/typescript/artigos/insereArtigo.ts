@@ -1,46 +1,58 @@
 window.onload = () => {
-  const form = document.getElementById('meuFormulario') as HTMLFormElement;
-  const mensagemDiv = document.getElementById('mensagem') as HTMLDivElement;
 
-  form.addEventListener('submit', (evento) => {
-    evento.preventDefault();
+    const categoriaSelect = document.getElementById("categoria") as HTMLSelectElement;
 
-    const token = localStorage.getItem('token');
+    fetch(backendAddress + "blog/categorias/")
+        .then(res => res.json())
+        .then(categorias => {
+            categorias.forEach((cat: any) => {
+                const opt = document.createElement("option");
+                opt.value = cat.id;
+                opt.textContent = cat.nome;
+                categoriaSelect.appendChild(opt);
+            });
+        })
+        .catch(err => console.error("Erro ao carregar categorias:", err));
 
-    if (!token) {
-      mensagemDiv.innerText = "Você precisa estar logado para publicar um artigo.";
-      return;
-    }
+    const form = document.getElementById("meuFormulario") as HTMLFormElement;
+    const mensagemDiv = document.getElementById("mensagem") as HTMLDivElement;
 
-    const data: Record<string, any> = {};
-    const elements = form.elements;
+    form.addEventListener("submit", (evento) => {
+        evento.preventDefault();
 
-    for (let i = 0; i < elements.length; i++) {
-      const el = elements[i] as HTMLInputElement | HTMLTextAreaElement;
-      if (!el.name) continue;
-      data[el.name] = el.type === 'number' ? Number(el.value) : el.value;
-    }
+        const token = localStorage.getItem("token");
+        if (!token) {
+            mensagemDiv.innerText = "Você precisa estar logado!";
+            return;
+        }
 
-    fetch(backendAddress + 'blog/umartigo/', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': tokenKeyword + localStorage.getItem('token'),
-      },
-      body: JSON.stringify(data),
-    })
+        const data = {
+            titulo: (document.getElementById("titulo") as HTMLInputElement).value,
+            conteudo: (document.getElementById("conteudo") as HTMLTextAreaElement).value,
+            categoria: categoriaSelect.value
+        };
 
-    .then(async (response) => {
-      if (response.ok) {
-        mensagemDiv.innerText = '✔️ Artigo inserido com sucesso!';
-        form.reset();
-      } else {
-        const texto = await response.text();
-        mensagemDiv.innerText = 'Erro ao inserir: ' + response.status + ' ' + texto;
-      }
-    })
-    .catch(() => {
-      mensagemDiv.innerText = 'Erro de comunicação com o servidor.';
+        fetch(backendAddress + "blog/umartigo/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Token " + token,
+            },
+            body: JSON.stringify(data),
+        })
+        .then(async (response) => {
+            if (response.ok) {
+                mensagemDiv.innerText = "Artigo inserido com sucesso!";
+                form.reset();
+            } else {
+                const erroTxt = await response.text();
+                mensagemDiv.innerText =
+                    "Erro ao inserir artigo: " + response.status + "\n" + erroTxt;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            mensagemDiv.innerText = "Erro de comunicação com servidor.";
+        });
     });
-  });
 };
