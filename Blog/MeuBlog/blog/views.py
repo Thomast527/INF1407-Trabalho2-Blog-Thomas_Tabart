@@ -34,23 +34,55 @@ class ArtigosView(APIView):
         },
     )
     def delete(self, request):
-        '''
-        Deleta um artigo específico pelo id
-        id_arg é o mesmo nome que colocamos em urls.py
-        '''
-        id_erro = ""
-        erro = False
-        for id in request.data:
-            artigo = Artigo.objects.get(id=id)
-            if artigo:
-                artigo.delete()
-            else:
-                id_erro += str(id)
-                erro = True
-        if erro:
-            return Response({'error': f'item [{id_erro}] não encontrado'},status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+
+        # --- 1) Cas d'un seul id envoyé dans un dict ---
+        if isinstance(data, dict):
+            artigo_ids = [data.get("id")]
+
+        # --- 2) Cas d'une liste d'IDs ---
+        elif isinstance(data, list):
+            artigo_ids = data
+
         else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"erro": "Formato de dados inválido."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # --- 3) Suppression article par article ---
+        for artigo_id in artigo_ids:
+
+            # id absent ?
+            if not artigo_id:
+                return Response(
+                    {"erro": "ID do artigo não enviado."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # article existe ?
+            try:
+                artigo = Artigo.objects.get(id=artigo_id)
+            except Artigo.DoesNotExist:
+                return Response(
+                    {"erro": f"Artigo com id {artigo_id} não encontrado"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # permission ?
+            if artigo.autor != request.user:
+                return Response(
+                    {"erro": "Você não tem permissão para apagar este artigo."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # suppression
+            artigo.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
     
 
@@ -153,17 +185,29 @@ class ArtigoView(APIView):
         ],
 	)
     def put(self, request, id_arg):
-        '''
-        Atualiza um artigo específico pelo id
-        id_arg é o mesmo nome que colocamos em urls.py
-        '''
+        # 1) Récupère l'article
         artigo = self.singleArtigo(id_arg)
-        serializer = ArtigoSerializer(artigo, data=request.data)
+        if not artigo:
+            return Response(
+                {"erro": "Artigo não encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # 2) Vérifie si l’utilisateur est le propriétaire
+        if artigo.autor != request.user:
+            return Response(
+                {"erro": "Você não tem permissão para alterar este artigo."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # 3) Continuer si autorisé
+        serializer = ArtigoSerializer(artigo, data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
 
 
 from .models import Categoria

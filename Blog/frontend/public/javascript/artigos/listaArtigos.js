@@ -1,8 +1,11 @@
 "use strict";
-onload = () => {
-    document.getElementById('insere').
-        addEventListener('click', evento => { location.href = 'insereArtigo.html'; });
-    document.getElementById("remove").addEventListener("click", apagaArtigos);
+window.onload = () => {
+    document.getElementById('insere')
+        .addEventListener('click', () => {
+        location.href = 'insereArtigo.html';
+    });
+    document.getElementById("remove")
+        .addEventListener("click", apagaArtigos);
     exibeListaDeArtigos();
 };
 function exibeListaDeArtigos() {
@@ -19,43 +22,50 @@ function exibeListaDeArtigos() {
                     <td>${artigo.data_publicacao}</td>
                 `;
             let checkbox = document.createElement('input');
-            checkbox.setAttribute('type', 'checkbox');
-            checkbox.setAttribute('name', 'id');
-            checkbox.setAttribute('id', 'id');
-            checkbox.setAttribute('value', artigo.id); // L'ID de l'article pour la suppression
+            checkbox.type = 'checkbox';
+            checkbox.value = artigo.id;
             let td = document.createElement('td');
             td.appendChild(checkbox);
             tr.appendChild(td);
             tbody.appendChild(tr);
         });
     })
-        .catch(error => {
-        console.error("Erro:", error);
-    });
+        .catch(error => console.error("Erro:", error));
 }
 let apagaArtigos = (evento) => {
     evento.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Você precisa estar logado para remover artigos!");
+        return;
+    }
     const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     const checkedValues = [];
-    checkboxes.forEach(checkbox => { checkedValues.push(checkbox.value); });
+    checkboxes.forEach(cb => checkedValues.push(cb.value));
+    if (checkedValues.length === 0) {
+        alert("Selecione pelo menos um artigo para remover.");
+        return;
+    }
     fetch(backendAddress + "blog/lista/", {
         method: 'DELETE',
-        body: JSON.stringify(checkedValues),
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + token
+        },
+        body: JSON.stringify(checkedValues)
     })
-        .then(response => {
+        .then(async (response) => {
         if (response.ok) {
             alert('Artigos removidos com sucesso!');
         }
         else {
-            alert('Artigos removidos com erro');
+            const msg = await response.text();
+            alert('Erro ao remover: ' + response.status + "\n" + msg);
         }
     })
         .catch(error => {
         console.log(error);
-        alert('Erro de comunicacao com o servedor');
+        alert('Erro de comunicação com o servidor.');
     })
-        .finally(() => {
-        exibeListaDeArtigos();
-    });
+        .finally(exibeListaDeArtigos);
 };
