@@ -22,18 +22,16 @@ window.onload = () => {
         fetch(backendAddress + "blog/categorias/")
             .then(r => r.json())
     ])
-        .then(([artigo, categorias]) => {
+        .then(([result, categorias]) => {
+        const artigo = result.dados;
         artigoData = artigo;
-        // Remplit le formulaire
         document.getElementById("id").value = artigo.id;
         document.getElementById("titulo").value = artigo.titulo;
         document.getElementById("conteudo").value = artigo.conteudo;
-        // 🔵 Remplir le select des catégories
         categorias.forEach((cat) => {
             const opt = document.createElement("option");
             opt.value = cat.id;
             opt.textContent = cat.nome;
-            // Pré-sélectionner la catégorie actuelle
             if (cat.id === artigo.categoria) {
                 opt.selected = true;
             }

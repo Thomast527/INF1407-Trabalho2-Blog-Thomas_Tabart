@@ -17,7 +17,7 @@ function exibeListaDeArtigos() {
         artigos.forEach((artigo) => {
             let tr = document.createElement('tr');
             tr.innerHTML = `
-                    <td><a href="update.html?id=${artigo.id}">${artigo.titulo}</a></td>
+                    <td><a href="viewArtigo.html?id=${artigo.id}">${artigo.titulo}</a></td>
                     <td>${artigo.autor}</td>
                     <td>${artigo.data_publicacao}</td>
                 `;

@@ -9,7 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes
 from rest_framework.decorators import authentication_classes
 
@@ -86,9 +86,13 @@ class ArtigosView(APIView):
 
     
 
+
 class ArtigoView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        # Toute méthode nécessite authentification
+        return [IsAuthenticated()]
 
 
     @swagger_auto_schema(
@@ -136,20 +140,26 @@ class ArtigoView(APIView):
 		],
 	)
     def get(self, request, id_arg):
-        '''
-        Retorna um artigo específico pelo id
-        id_arg é o mesmo nome que colocamos em urls.py
-        '''
-        queryset = self.singleArtigo(id_arg)
-        if queryset:
-            serializer = ArtigoSerializer(queryset)
-            return Response(serializer.data)
-        else:
-            # response for IDs that is not an existing car
+        artigo = self.singleArtigo(id_arg)
+
+        if not artigo:
             return Response(
-                { 'msg': f'Artigo com id #{id_arg} não existe' }, 
-                status.HTTP_400_BAD_REQUEST,
+                {'msg': f'Artigo com id #{id_arg} não existe'},
+                status=status.HTTP_404_NOT_FOUND
             )
+
+        serializer = ArtigoSerializer(artigo)
+
+        # Vérifie si l'utilisateur est l'auteur
+        est_autor = False
+        if request.user.is_authenticated:
+            est_autor = (artigo.autor == request.user)
+
+        return Response({
+            "dados": serializer.data,
+            "est_autor": est_autor
+        })
+
         
     def singleArtigo(self, id_arg):
         try:

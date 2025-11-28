@@ -29,30 +29,28 @@ window.onload = () => {
         fetch(backendAddress + "blog/categorias/")
             .then(r => r.json())
     ])
-    .then(([artigo, categorias]) => {
+    .then(([result, categorias]) => {
+        const artigo = result.dados; 
 
         artigoData = artigo;
 
-        // Remplit le formulaire
         (document.getElementById("id") as HTMLInputElement).value = artigo.id;
         (document.getElementById("titulo") as HTMLInputElement).value = artigo.titulo;
-        (document.getElementById("conteudo") as HTMLInputElement).value = artigo.conteudo;
+        (document.getElementById("conteudo") as HTMLTextAreaElement).value = artigo.conteudo;
 
-        // 🔵 Remplir le select des catégories
         categorias.forEach((cat: any) => {
             const opt = document.createElement("option");
             opt.value = cat.id;
             opt.textContent = cat.nome;
 
-            // Pré-sélectionner la catégorie actuelle
             if (cat.id === artigo.categoria) {
                 opt.selected = true;
             }
 
             categoriaSelect.appendChild(opt);
         });
-
     })
+
     .catch(err => {
         console.error(err);
         alert("Erro ao carregar dados.");
