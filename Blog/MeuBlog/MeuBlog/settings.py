@@ -42,9 +42,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'rest_framework',
     "blog",
-    'corsheaders',
+    'corsheaders', # CORS
     'drf_yasg', # swagger
     'coreapi', # swagger
+    'accounts', # nosso app de AAA
+    'rest_framework.authtoken', # Token de autenticação
 ]
 
 MIDDLEWARE = [

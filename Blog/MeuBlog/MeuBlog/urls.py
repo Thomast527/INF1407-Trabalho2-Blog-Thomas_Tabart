@@ -46,9 +46,11 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path("admin/", admin.site.urls),
     path("blog/", include ('blog.urls')),
+    path('accounts/', include('accounts.urls')),
     path('openapi', get_schema_view(
         title="API para Artigos", description="API para obter dados dos artigos",
         ), 
         name = 'openapi-schema'
     ),
+    
 ]
