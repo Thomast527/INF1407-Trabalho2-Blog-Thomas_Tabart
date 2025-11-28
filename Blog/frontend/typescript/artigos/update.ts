@@ -1,6 +1,12 @@
 window.onload = () => {
 
-    // 1) Récupère l'ID dans l'URL (ex: update.html?id=12)
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Você precisa estar logado para atualizar um artigo!");
+        window.location.href = "../accounts/login.html";
+        return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
@@ -9,33 +15,44 @@ window.onload = () => {
         return;
     }
 
-    // Affiche l'ID dans le titre
     (document.getElementById("artigoId") as HTMLSpanElement).innerText = id;
 
-    // 2) Charge les données du carro pour pré-remplir le formulaire
-    fetch(backendAddress + "blog/umartigo/" + id + "/")
-        .then(response => response.json())
+    fetch(backendAddress + "blog/umartigo/" + id + "/", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + token
+        }
+    })
+        .then(async response => {
+            if (!response.ok) {
+                const msg = await response.text();
+                throw new Error("Erro ao carregar artigo: " + msg);
+            }
+            return response.json();
+        })
         .then(artigo => {
             (document.getElementById("id") as HTMLInputElement).value = artigo.id;
             (document.getElementById("titulo") as HTMLInputElement).value = artigo.titulo;
             (document.getElementById("conteudo") as HTMLInputElement).value = artigo.conteudo;
             (document.getElementById("categoria") as HTMLInputElement).value = artigo.categoria;
-            (document.getElementById("autor") as HTMLInputElement).value = artigo.autor;
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao carregar o artigo.");
+        });
 
-    // 3) Gestion du bouton Atualiza
-    const botao = document.getElementById('atualiza') as HTMLButtonElement;
+    const botao = document.getElementById("atualiza") as HTMLButtonElement;
 
-    botao.addEventListener('click', (evento) => {
+    botao.addEventListener("click", (evento) => {
         evento.preventDefault();
 
-        const form = document.getElementById('meuFormulario') as HTMLFormElement;
+        const form = document.getElementById("meuFormulario") as HTMLFormElement;
         const elements = form.elements;
-        const data: Record<string, string> = {};
+        const data: Record<string, any> = {};
 
         for (let i = 0; i < elements.length; i++) {
-            const element = elements[i] as HTMLInputElement;
+            const element = elements[i] as HTMLInputElement | HTMLTextAreaElement;
             if (element.name) {
                 data[element.name] = element.value;
             }
@@ -43,25 +60,25 @@ window.onload = () => {
 
         fetch(backendAddress + "blog/umartigo/" + id + "/", {
             method: "PUT",
-            body: JSON.stringify(data),
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": "Token " + token
             },
+            body: JSON.stringify(data)
         })
-        .then(response => {
-            const msgDiv = document.getElementById('mensagem') as HTMLDivElement;
-
-            if (response.ok) {
-                msgDiv.innerHTML = "✔️ Sucesso ao atualizar!";
-            } else {
-                msgDiv.innerHTML =
-                    "Erro: " + response.status + " " + response.statusText;
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            (document.getElementById('mensagem') as HTMLDivElement).innerHTML =
-                "Erro de comunicação com servidor.";
-        });
+            .then(async (response) => {
+                const msgDiv = document.getElementById("mensagem") as HTMLDivElement;
+                if (response.ok) {
+                    msgDiv.innerHTML = "✔️ Artigo atualizado com sucesso!";
+                } else {
+                    const msg = await response.text();
+                    msgDiv.innerHTML = "Erro: " + response.status + "<br>" + msg;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                const msgDiv = document.getElementById("mensagem") as HTMLDivElement;
+                msgDiv.innerHTML = "Erro ao comunicar com o servidor.";
+            });
     });
 };

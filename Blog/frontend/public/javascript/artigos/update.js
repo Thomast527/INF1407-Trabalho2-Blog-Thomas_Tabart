@@ -1,30 +1,46 @@
 "use strict";
 window.onload = () => {
-    // 1) Récupère l'ID dans l'URL (ex: update.html?id=12)
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Você precisa estar logado para atualizar um artigo!");
+        window.location.href = "../accounts/login.html";
+        return;
+    }
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
     if (!id) {
         alert("Erro: nenhum ID de artigo informado!");
         return;
     }
-    // Affiche l'ID dans le titre
     document.getElementById("artigoId").innerText = id;
-    // 2) Charge les données du carro pour pré-remplir le formulaire
-    fetch(backendAddress + "blog/umartigo/" + id + "/")
-        .then(response => response.json())
+    fetch(backendAddress + "blog/umartigo/" + id + "/", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Token " + token
+        }
+    })
+        .then(async (response) => {
+        if (!response.ok) {
+            const msg = await response.text();
+            throw new Error("Erro ao carregar artigo: " + msg);
+        }
+        return response.json();
+    })
         .then(artigo => {
         document.getElementById("id").value = artigo.id;
         document.getElementById("titulo").value = artigo.titulo;
         document.getElementById("conteudo").value = artigo.conteudo;
         document.getElementById("categoria").value = artigo.categoria;
-        document.getElementById("autor").value = artigo.autor;
     })
-        .catch(err => console.error(err));
-    // 3) Gestion du bouton Atualiza
-    const botao = document.getElementById('atualiza');
-    botao.addEventListener('click', (evento) => {
+        .catch(err => {
+        console.error(err);
+        alert("Erro ao carregar o artigo.");
+    });
+    const botao = document.getElementById("atualiza");
+    botao.addEventListener("click", (evento) => {
         evento.preventDefault();
-        const form = document.getElementById('meuFormulario');
+        const form = document.getElementById("meuFormulario");
         const elements = form.elements;
         const data = {};
         for (let i = 0; i < elements.length; i++) {
@@ -35,25 +51,26 @@ window.onload = () => {
         }
         fetch(backendAddress + "blog/umartigo/" + id + "/", {
             method: "PUT",
-            body: JSON.stringify(data),
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": "Token " + token
             },
+            body: JSON.stringify(data)
         })
-            .then(response => {
-            const msgDiv = document.getElementById('mensagem');
+            .then(async (response) => {
+            const msgDiv = document.getElementById("mensagem");
             if (response.ok) {
-                msgDiv.innerHTML = "✔️ Sucesso ao atualizar!";
+                msgDiv.innerHTML = "✔️ Artigo atualizado com sucesso!";
             }
             else {
-                msgDiv.innerHTML =
-                    "Erro: " + response.status + " " + response.statusText;
+                const msg = await response.text();
+                msgDiv.innerHTML = "Erro: " + response.status + "<br>" + msg;
             }
         })
             .catch(err => {
             console.error(err);
-            document.getElementById('mensagem').innerHTML =
-                "Erro de comunicação com servidor.";
+            const msgDiv = document.getElementById("mensagem");
+            msgDiv.innerHTML = "Erro ao comunicar com o servidor.";
         });
     });
 };
