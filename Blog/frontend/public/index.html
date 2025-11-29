@@ -1,15 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raiz de Artigos</title>
+    <title>Meu Blog</title>
+
     <script src="javascript/constantes.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/estilo.css">
 </head>
+
 <body>
-    <iframe src="cabecalho.html" frameborder="0" width="100%" height="50" id="cabecalho"></iframe>
-    <h1>Bem vindo no meu Blog !</h1>
-    
+
+    <iframe src="cabecalho.html" frameborder="0" width="100%" height="60" id="cabecalho"></iframe>
+
+    <section class="hero mb-5">
+        <img src="/images/hero.jpg" alt="hero">
+        <div class="overlay"></div>
+
+        <div class="content container">
+            <h1 class="display-4 fw-bold">Bem-vindo ao Meu Blog</h1>
+            <p class="lead">Relatos, dicas e inspirações de todos os cantos do mundo.</p>
+            <a href="articles/listaArtigos.html" class="btn btn-primary btn-lg mt-3">
+                Explorar os artigos
+            </a>
+        </div>
+    </section>
+
+    <div class="container mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h3 class="mb-3">O que você encontrará aqui:</h3>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Diários de viagem – Histórias e aventuras reais.</li>
+                    <li class="list-group-item">Guias práticos – Dicas para viagens econômicas.</li>
+                    <li class="list-group-item">Inspirações visuais – Fotos e vídeos para sonhar.</li>
+                    <li class="list-group-item">Cultura local – Gastronomia, tradições e encontros.</li>
+                    <li class="list-group-item">Imperdíveis – Lugares fascinantes ao redor do mundo.</li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="text-center text-muted mt-3">
+            Cada viagem é uma história. Venha escrever a sua conosco!
+        </p>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

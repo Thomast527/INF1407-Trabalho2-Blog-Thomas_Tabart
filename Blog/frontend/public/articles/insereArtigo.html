@@ -10,6 +10,7 @@
   <script src="../javascript/artigos/insereArtigo.js" defer></script>
 
   <link rel="stylesheet" href="../css/estilo.css">
+  <link rel="stylesheet" href="../css/insereArtigo.css">
 </head>
 
 <body>
@@ -19,26 +20,25 @@
 
   <form id="meuFormulario">
     <div>
-      <label for="titulo">Título</label><br>
+      <label for="titulo">Título</label>
       <input id="titulo" type="text" name="titulo" required>
     </div>
 
     <div>
-      <label for="conteudo">Conteúdo</label><br>
-      <textarea id="conteudo" name="conteudo" rows="10" cols="60" required></textarea>
+      <label for="conteudo">Conteúdo</label>
+      <textarea id="conteudo" name="conteudo" rows="10" required></textarea>
     </div>
 
     <div>
-      <label for="categoria">Categoria</label><br>
+      <label for="categoria">Categoria</label>
       <select id="categoria" name="categoria"></select>
-
     </div>
 
-    <div>
+    <div style="text-align:right;">
       <button id="insere" type="submit">Inserir artigo</button>
     </div>
   </form>
 
-  <div id="mensagem" style="margin-top:1rem;"></div>
+  <div id="mensagem"></div>
 </body>
 </html>

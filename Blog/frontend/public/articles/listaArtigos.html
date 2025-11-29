@@ -1,31 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raiz de Artigos</title>
-    <script src="../javascript/artigos/listaArtigos.js"></script>
-    <script src="../javascript/constantes.js"></script>
+    <title>Lista de Artigos</title>
+    
+    <script src="../javascript/artigos/listaArtigos.js" defer></script>
+    <script src="../javascript/constantes.js" defer></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/estilo.css">
 </head>
 <body>
-    <iframe src="../cabecalho.html" frameborder="0" width="100%" height="50" id="cabecalho"></iframe>
 
-    <h2>Lista de artigos</h2>   
-    <form action="" method="get">
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Data</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody id="idtbody"></tbody>
-        </table>
-        <input type="button" value="Insere" id="insere"/>
-        <input type="button" value="Remove" id="remove"/>
-    </form>
+    <iframe src="../cabecalho.html" frameborder="0" width="100%" height="60" id="cabecalho"></iframe>
+
+    <div class="container my-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Lista de Artigos</h2>
+            <div>
+                <button id="insere" class="btn btn-success me-2">Insere</button>
+                <button id="remove" class="btn btn-danger">Remove</button>
+            </div>
+        </div>
+
+        <div id="artigosContainer" class="row g-3">
+            <!-- Les articles seront injectés ici par listaArtigos.js -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

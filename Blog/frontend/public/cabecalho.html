@@ -2,23 +2,35 @@
 <html lang="pt-BR">
 
 <head>
-    <script src="/javascript/accounts/autenticacao.js"></script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/estilo.css">
+
     <script src="/javascript/constantes.js"></script>
-    <link rel="stylesheet" href="css/estilo.css">
+    <script src="/javascript/accounts/autenticacao.js"></script>
+
 </head>
 
 <body>
-    <a href="/" target="_top">Home</a>
-    | <a href="/articles/listaArtigos.html" target="_top"> Artigos</a>
-    <div id="unlogged" class="visivel">
-        | <a href="login.html" target="_top">Login</a>
-    </div>
-    <div id="logged" class="invisivel">
-        | <a href="passwordChange.html" target="_top">Troca senha</a>
-        | <a href="logout.html" target="_top">Logout</a>
-    </div>
-    | Você é <div id="identificacao" class="mesmaLinha">visitante</div>
-    <hr>
-</body>
 
+    <nav>
+        <div class="nav-left">
+            <a href="/" target="_top">Home</a>
+            |
+            <a href="/articles/listaArtigos.html" target="_top">Artigos</a>
+        </div>
+
+        <div class="nav-right">
+            <div id="unlogged" class="visivel">
+                <a href="login.html" target="_top">Login</a>
+            </div>
+
+            <div id="logged" class="invisivel">
+                <a href="passwordChange.html" target="_top">Trocar Senha</a>
+                |
+                <a href="logout.html" target="_top">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+</body>
 </html>

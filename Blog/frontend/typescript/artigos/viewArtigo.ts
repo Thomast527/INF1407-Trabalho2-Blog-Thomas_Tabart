@@ -46,7 +46,7 @@ fetch(backendAddress + "blog/umartigo/" + id + "/", fetchConfig)
 
         if (result.est_autor === true) {
             const btn = document.getElementById("botaoUpdate") as HTMLButtonElement;
-            btn.style.display = "block";
+            btn.style.display = "inline-block";
             btn.onclick = () => {
                 window.location.href = "update.html?id=" + artigo.id;
             };

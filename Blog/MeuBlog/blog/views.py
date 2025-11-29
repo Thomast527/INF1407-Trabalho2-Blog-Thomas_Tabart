@@ -37,11 +37,9 @@ class ArtigosView(APIView):
 
         data = request.data
 
-        # --- 1) Cas d'un seul id envoyé dans un dict ---
         if isinstance(data, dict):
             artigo_ids = [data.get("id")]
 
-        # --- 2) Cas d'une liste d'IDs ---
         elif isinstance(data, list):
             artigo_ids = data
 
@@ -51,17 +49,14 @@ class ArtigosView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # --- 3) Suppression article par article ---
         for artigo_id in artigo_ids:
 
-            # id absent ?
             if not artigo_id:
                 return Response(
                     {"erro": "ID do artigo não enviado."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # article existe ?
             try:
                 artigo = Artigo.objects.get(id=artigo_id)
             except Artigo.DoesNotExist:
@@ -70,14 +65,12 @@ class ArtigosView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            # permission ?
             if artigo.autor != request.user:
                 return Response(
                     {"erro": "Você não tem permissão para apagar este artigo."},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # suppression
             artigo.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -104,7 +97,7 @@ class ArtigoView(APIView):
 	)
     # empêcher criação por usuarios sem role escritor
     def post(self, request):
-        if not request.user.groups.filter(name="escritor").exists():
+        if not request.user.groups.filter(name__iexact="escritor").exists():
             return Response(
                 {"erro": "Você não tem permissão para publicar artigos."},
                 status=status.HTTP_403_FORBIDDEN
@@ -153,7 +146,6 @@ class ArtigoView(APIView):
 
         serializer = ArtigoSerializer(artigo)
 
-        # Vérifie si l'utilisateur est l'auteur
         est_autor = False
         if request.user.is_authenticated:
             est_autor = (artigo.autor == request.user)
@@ -198,7 +190,6 @@ class ArtigoView(APIView):
         ],
 	)
     def put(self, request, id_arg):
-        # 1) Récupère l'article
         artigo = self.singleArtigo(id_arg)
         if not artigo:
             return Response(
@@ -206,14 +197,12 @@ class ArtigoView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # 2) Vérifie si l’utilisateur est le propriétaire
         if artigo.autor != request.user:
             return Response(
                 {"erro": "Você não tem permissão para alterar este artigo."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 3) Continuer si autorisé
         serializer = ArtigoSerializer(artigo, data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save()

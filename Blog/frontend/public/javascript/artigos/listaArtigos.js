@@ -18,37 +18,48 @@ window.onload = async () => {
     var _a, _b;
     const user = await obtemUsuario();
     const botaoInsere = document.getElementById('insere');
-    const isEscritor = (_b = (_a = user === null || user === void 0 ? void 0 : user.groups) === null || _a === void 0 ? void 0 : _a.includes("escritor")) !== null && _b !== void 0 ? _b : false;
-    if (!isEscritor) {
+    const botaoRemove = document.getElementById('remove');
+    // Si l'utilisateur n'est pas auteur, cacher les boutons et la sélection
+    const ehAutor = (_b = (_a = user === null || user === void 0 ? void 0 : user.groups) === null || _a === void 0 ? void 0 : _a.some((g) => { var _a; return ((_a = g.name) !== null && _a !== void 0 ? _a : g).toLowerCase() === "escritor"; })) !== null && _b !== void 0 ? _b : false;
+    console.log("GROUPS:", user === null || user === void 0 ? void 0 : user.groups);
+    console.log("isEscritor =", ehAutor);
+    if (!ehAutor) {
         botaoInsere.style.display = "none";
+        botaoRemove.style.display = "none";
     }
     botaoInsere.addEventListener('click', () => {
         location.href = 'insereArtigo.html';
     });
-    document.getElementById("remove")
-        .addEventListener("click", apagaArtigos);
-    exibeListaDeArtigos();
+    botaoRemove.addEventListener("click", apagaArtigos);
+    exibeListaDeArtigos(ehAutor);
 };
-function exibeListaDeArtigos() {
+function exibeListaDeArtigos(ehAutor) {
+    const mostrarCheckbox = ehAutor !== null && ehAutor !== void 0 ? ehAutor : false; // par défaut faux si pas fourni
     fetch(backendAddress + "blog/lista/")
         .then(resp => resp.json())
         .then(artigos => {
-        let tbody = document.getElementById('idtbody');
-        tbody.innerHTML = "";
+        const container = document.getElementById('artigosContainer');
+        container.innerHTML = "";
         artigos.forEach((artigo) => {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                    <td><a href="viewArtigo.html?id=${artigo.id}">${artigo.titulo}</a></td>
-                    <td>${artigo.autor}</td>
-                    <td>${artigo.data_publicacao}</td>
+            const div = document.createElement('div');
+            div.className = 'col-md-6 col-lg-4';
+            div.innerHTML = `
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="viewArtigo.html?id=${artigo.id}">${artigo.titulo}</a>
+                            </h5>
+                            <p class="card-text"><strong>Autor:</strong> ${artigo.autor}</p>
+                            <p class="card-text"><small class="text-muted">${artigo.data_publicacao}</small></p>
+                        </div>
+                        ${mostrarCheckbox ? `
+                        <div class="card-footer">
+                            <input type="checkbox" class="form-check-input remove-checkbox" value="${artigo.id}">
+                            <label class="form-check-label">Selecionar para remover</label>
+                        </div>` : ''}
+                    </div>
                 `;
-            let checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = artigo.id;
-            let td = document.createElement('td');
-            td.appendChild(checkbox);
-            tr.appendChild(td);
-            tbody.appendChild(tr);
+            container.appendChild(div);
         });
     })
         .catch(error => console.error("Erro:", error));

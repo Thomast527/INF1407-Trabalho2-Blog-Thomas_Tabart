@@ -16,59 +16,75 @@ async function obtemUsuario() {
     return null;
 }
 
+
 window.onload = async () => {
 
     const user = await obtemUsuario();
+
     const botaoInsere = document.getElementById('insere') as HTMLButtonElement;
+    const botaoRemove = document.getElementById('remove') as HTMLButtonElement;
 
-    const isEscritor = user?.groups?.includes("escritor") ?? false;
+    // Si l'utilisateur n'est pas auteur, cacher les boutons et la sélection
+    const ehAutor = user?.groups?.some(
+        (g: any) => (g.name ?? g).toLowerCase() === "escritor"
+    ) ?? false;
 
-    if (!isEscritor) {
+    console.log("GROUPS:", user?.groups);
+    console.log("isEscritor =", ehAutor);
+
+    if (!ehAutor) {
         botaoInsere.style.display = "none";
+        botaoRemove.style.display = "none";
     }
 
     botaoInsere.addEventListener('click', () => { 
         location.href = 'insereArtigo.html';
     });
 
-    document.getElementById("remove")!
-        .addEventListener("click", apagaArtigos);
+    botaoRemove.addEventListener("click", apagaArtigos);
 
-    exibeListaDeArtigos();
+    exibeListaDeArtigos(ehAutor);
 };
 
 
 
 
-function exibeListaDeArtigos() {
+function exibeListaDeArtigos(ehAutor?: boolean): void {
+    const mostrarCheckbox = ehAutor ?? false; // par défaut faux si pas fourni
+
     fetch(backendAddress + "blog/lista/")
         .then(resp => resp.json())
         .then(artigos => {
-            let tbody = document.getElementById('idtbody') as HTMLTableSectionElement;
-            tbody.innerHTML = "";
+            const container = document.getElementById('artigosContainer')!;
+            container.innerHTML = "";
 
             artigos.forEach((artigo: any) => {
-                let tr = document.createElement('tr');
+                const div = document.createElement('div');
+                div.className = 'col-md-6 col-lg-4';
 
-                tr.innerHTML = `
-                    <td><a href="viewArtigo.html?id=${artigo.id}">${artigo.titulo}</a></td>
-                    <td>${artigo.autor}</td>
-                    <td>${artigo.data_publicacao}</td>
+                div.innerHTML = `
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="viewArtigo.html?id=${artigo.id}">${artigo.titulo}</a>
+                            </h5>
+                            <p class="card-text"><strong>Autor:</strong> ${artigo.autor}</p>
+                            <p class="card-text"><small class="text-muted">${artigo.data_publicacao}</small></p>
+                        </div>
+                        ${mostrarCheckbox ? `
+                        <div class="card-footer">
+                            <input type="checkbox" class="form-check-input remove-checkbox" value="${artigo.id}">
+                            <label class="form-check-label">Selecionar para remover</label>
+                        </div>` : ''}
+                    </div>
                 `;
-
-                let checkbox = document.createElement('input') as HTMLInputElement;
-                checkbox.type = 'checkbox';
-                checkbox.value = artigo.id;
-
-                let td = document.createElement('td');
-                td.appendChild(checkbox);
-                tr.appendChild(td);
-
-                tbody.appendChild(tr);
+                container.appendChild(div);
             });
         })
         .catch(error => console.error("Erro:", error));
 }
+
+
 
 let apagaArtigos = (evento: Event) => {
     evento.preventDefault();

@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #333;
+}
+
+#autor, #data {
+    text-align: center;
+    margin: 0.2rem 0;
+    color: #666;
+}
+
+#conteudo {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem 2rem;
+    background: white;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    line-height: 1.6rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 2rem auto;
+    max-width: 800px;
+}
+
+
+
+#botaoUpdate:hover {
+    background: #005fa3;
+}
