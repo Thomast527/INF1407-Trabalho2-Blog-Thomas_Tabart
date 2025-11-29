@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,15 +21,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-!)304_@5%d195ecvdc^*^8-rljhu@=#&rmb-43gz#!70vu+moq"
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = [
-    'https://localhost:8000',
-    'http://localhost:8000',
+ALLOWED_HOSTS = ['Thomast527.pythonanywhere.com']
+CSRF_TRUSTED_ORIGINS = ['https://Thomast527.pythonanywhere.com']
+
+SECURE_SSL_REDIRECT = True          # force HTTPS
+SESSION_COOKIE_SECURE = True        # cookies sécurisés
+CSRF_COOKIE_SECURE = True           # cookies CSRF sécurisés
+CORS_ALLOW_ALL_ORIGINS = False      # à remplacer par ton frontend seulement
+CORS_ALLOWED_ORIGINS = [
+    "https://thomast527.github.io/INF1407-Trabalho2-Frontend/",
 ]
 
 # Application definition
@@ -146,7 +152,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOW_ALL_ORIGINS = True
 
 SERVER_URL = "https://redesigned-meme-r479rgjqgr54fp4wp-8000.app.github.dev"
 
