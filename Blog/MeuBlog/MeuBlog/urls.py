@@ -30,16 +30,27 @@ from drf_yasg import openapi
 
 schema_view = yasg_schema_view(
     openapi.Info(
-        title = "API Blog",
-        default_version = 'v1',
-        description = "API for the Blog",
-        contact = openapi.Contact(email="thomas@aqui.com"),
-        license = openapi.License(name='GNU GPLv3'),
+        title="API Blog",
+        default_version='v1',
+        description="API for the Blog",
+        contact=openapi.Contact(email="thomas@aqui.com"),
+        license=openapi.License(name='GNU GPLv3'),
     ),
-    public = True,
-    permission_classes = (permissions.AllowAny,),
-    url = SERVER_URL,
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    url=SERVER_URL,
 )
+
+schema_view.security_definitions = {
+    "Token": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Use o formato: Token <seu_token>",
+    }
+}
+
+
 
 urlpatterns = [
     path('docs/', include_docs_urls(title = 'Documentação da API')),

@@ -24,7 +24,6 @@ window.onload = async () => {
     const botaoInsere = document.getElementById('insere') as HTMLButtonElement;
     const botaoRemove = document.getElementById('remove') as HTMLButtonElement;
 
-    // Si l'utilisateur n'est pas auteur, cacher les boutons et la sélection
     const ehAutor = user?.groups?.some(
         (g: any) => (g.name ?? g).toLowerCase() === "escritor"
     ) ?? false;
@@ -50,7 +49,7 @@ window.onload = async () => {
 
 
 function exibeListaDeArtigos(ehAutor?: boolean): void {
-    const mostrarCheckbox = ehAutor ?? false; // par défaut faux si pas fourni
+    const mostrarCheckbox = ehAutor ?? false; 
 
     fetch(backendAddress + "blog/lista/")
         .then(resp => resp.json())

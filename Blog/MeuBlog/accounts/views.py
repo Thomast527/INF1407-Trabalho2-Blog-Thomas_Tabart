@@ -26,16 +26,6 @@ class CustomAuthToken(ObtainAuthToken):
             Retorna 200 OK com o nome de usuário em caso de sucesso ou 404 Not Found se o token for inválido.
         ''',
         security=[{'Token': []}],
-        manual_parameters=[
-            openapi.Parameter(
-                'Authorization',
-                openapi.IN_HEADER,
-                description="Token de autenticação no formato: Token <seu_token_aqui>",
-                type=openapi.TYPE_STRING,
-                required=True,
-                default='Token ',
-            ),
-        ],
         responses={
             status.HTTP_200_OK: "Nome de usuário obtido com sucesso",
             status.HTTP_404_NOT_FOUND: "Token inválido",
@@ -58,12 +48,6 @@ class CustomAuthToken(ObtainAuthToken):
         operation_description='Realiza logout do usuário, apagando o seu token',
         operation_summary='Realiza logout',
         security=[{'Token':[]}],
-        manual_parameters=[
-            openapi.Parameter('Authorization', openapi.IN_HEADER,
-            type=openapi.TYPE_STRING, default='token ',
-            description='Token de autenticação no formato "token \<<i>valor do token</i>\>"',
-            ),
-        ],
         request_body=None,
         responses={
             status.HTTP_200_OK: 'User logged out',
@@ -96,15 +80,7 @@ class CustomAuthToken(ObtainAuthToken):
     @swagger_auto_schema(
         operation_description='Troca a senha do usuário, atualiza o token em caso de sucesso',
         operation_summary='Troca a senha do usuário',
-        manual_parameters=[
-            openapi.Parameter(
-                'Authorization',
-                openapi.IN_HEADER,
-                type=openapi.TYPE_STRING,
-                description='Token de autenticação no formato "token \<<i>valor do token</i>\>"',
-                default='token ',
-            ),
-        ],
+        security=[{'Token': []}],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -152,6 +128,21 @@ class CustomAuthToken(ObtainAuthToken):
 
 
 class RegisterView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Registrar novo usuário",
+        operation_description="Cria um novo usuário no sistema e retorna o token gerado.",
+        request_body=RegisterSerializer,
+        responses={
+            201: openapi.Response(
+                description="Usuário criado",
+                examples={"application/json": {
+                    "msg": "Usuário criado com sucesso!",
+                    "token": "<token_gerado>"
+                }}
+            ),
+            400: openapi.Response(description="Dados inválidos.")
+        }
+    )
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -170,6 +161,22 @@ class RegisterView(APIView):
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Obter informações do usuário autenticado",
+        operation_description="Retorna username, id e grupos do usuário logado.",
+        security=[{'Token': []}],
+        responses={
+            200: openapi.Response(
+                description="Informações do usuário",
+                examples={"application/json": {
+                    "username": "jose",
+                    "id": 4,
+                    "groups": ["escritor"]
+                }}
+            )
+        }
+    )
 
     def get(self, request):
         user = request.user

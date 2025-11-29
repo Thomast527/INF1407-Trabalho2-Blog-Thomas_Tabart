@@ -19,7 +19,6 @@ window.onload = async () => {
     const user = await obtemUsuario();
     const botaoInsere = document.getElementById('insere');
     const botaoRemove = document.getElementById('remove');
-    // Si l'utilisateur n'est pas auteur, cacher les boutons et la sélection
     const ehAutor = (_b = (_a = user === null || user === void 0 ? void 0 : user.groups) === null || _a === void 0 ? void 0 : _a.some((g) => { var _a; return ((_a = g.name) !== null && _a !== void 0 ? _a : g).toLowerCase() === "escritor"; })) !== null && _b !== void 0 ? _b : false;
     console.log("GROUPS:", user === null || user === void 0 ? void 0 : user.groups);
     console.log("isEscritor =", ehAutor);
@@ -34,7 +33,7 @@ window.onload = async () => {
     exibeListaDeArtigos(ehAutor);
 };
 function exibeListaDeArtigos(ehAutor) {
-    const mostrarCheckbox = ehAutor !== null && ehAutor !== void 0 ? ehAutor : false; // par défaut faux si pas fourni
+    const mostrarCheckbox = ehAutor !== null && ehAutor !== void 0 ? ehAutor : false;
     fetch(backendAddress + "blog/lista/")
         .then(resp => resp.json())
         .then(artigos => {
